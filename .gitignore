@@ -1,0 +1,23 @@
+# Build output
+.gradle/
+.kotlin/
+build/
+*/build/
+dist/
+*.apk
+*.aab
+
+# Machine-specific
+local.properties
+.idea/
+*.iml
+.DS_Store
+
+# SECRETS: release signing key and passwords. Never commit these.
+keystore/
+keystore.properties
+*.jks
+*.keystore
+*.p12
+*.pem
+.env

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <application
+        android:networkSecurityConfig="@xml/debug_network"
+        tools:ignore="UnusedAttribute">
+        <!-- Debug builds only: lets automated tests drive RDM Eq over adb. Not in the release APK. -->
+        <receiver android:name=".debug.DebugControlReceiver" android:exported="true" />
+    </application>
+</manifest>

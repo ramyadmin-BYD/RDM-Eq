@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.RdmEq" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/rdm_bg</item>
+        <item name="android:statusBarColor">@color/rdm_bg</item>
+        <item name="android:navigationBarColor">@color/rdm_bg</item>
+    </style>
+</resources>
