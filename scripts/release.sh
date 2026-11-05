@@ -55,11 +55,12 @@ APK_SRC=app/build/outputs/apk/release/app-release.apk
 "$BT/apksigner" verify "$APK_SRC" || die "APK signature is invalid"
 CERT=$("$BT/apksigner" verify --print-certs "$APK_SRC" | awk '/Signer #1 certificate SHA-256 digest/ {print $NF}')
 [[ "$CERT" == "$EXPECTED_CERT" ]] || die "APK is signed with $CERT, expected $EXPECTED_CERT (different key = users can't update)"
-BADGING=$("$BT/aapt2" dump badging "$APK_SRC" | head -1)
+BADGING_ALL=$("$BT/aapt2" dump badging "$APK_SRC")
+BADGING="${BADGING_ALL%%$'\n'*}"
 [[ "$BADGING" == *"name='$APP_ID'"* ]] || die "Wrong application id: $BADGING"
 [[ "$BADGING" == *"versionCode='$NEW_CODE'"* ]] || die "Wrong versionCode: $BADGING"
 [[ "$BADGING" == *"versionName='$VERSION_NAME'"* ]] || die "Wrong versionName: $BADGING"
-MIN_SDK=$("$BT/aapt2" dump badging "$APK_SRC" | sed -n "s/^minSdkVersion:'\([0-9]*\)'/\1/p")
+MIN_SDK=$(sed -n "s/^minSdkVersion:'\([0-9]*\)'/\1/p" <<< "$BADGING_ALL")
 
 # 4. Package + checksum + metadata
 OUT="dist/$TAG"; rm -rf "$OUT"; mkdir -p "$OUT"
