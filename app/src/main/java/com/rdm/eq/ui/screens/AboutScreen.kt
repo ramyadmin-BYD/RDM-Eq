@@ -148,7 +148,7 @@ private fun AboutInfoCard(modifier: Modifier) {
     SectionCard("About", modifier) {
         Text("RDM Eq ${BuildConfig.VERSION_NAME}")
         Text(
-            "A 7-band equalizer for BYD DiLink 5 / 5.1. The equalizer works fully offline. " +
+            "A 10-band equalizer for BYD DiLink 5 / 5.1. The equalizer works fully offline. " +
                 "The internet is used only to check GitHub for RDM Eq updates — no analytics, ads or accounts.",
             color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium,
         )

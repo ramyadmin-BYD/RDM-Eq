@@ -1,4 +1,4 @@
-# RDM Eq — 7-band equalizer for BYD DiLink 5
+# RDM Eq — 10-band equalizer for BYD DiLink 5
 
 RDM Eq is an Android equalizer built for the BYD Song L EV head unit (DiLink 5). It processes real audio
 through Android's own audio-effect engine. It works on **audio from other apps** whenever that app
@@ -22,9 +22,10 @@ tells Android which audio session it is playing on. Spotify and most music playe
 
 ## Features
 
-- **Seven bands** at 60 Hz, 150 Hz, 400 Hz, 1 kHz, 2.4 kHz, 6 kHz and 15 kHz, from −12 to +12 dB in 0.5 dB steps.
-  Drag a fader, tap +/− for fine steps, or double-tap it to reset to 0.
-  The engine turns the 7 points into a smooth 24-band curve (log-frequency interpolation), so the labels are the real frequencies.
+- **Ten bands** at 31, 62, 125, 250, 500 Hz, 1, 2, 4, 8 and 16 kHz, from −12 to +12 dB in 0.5 dB steps.
+  Each band has **+ / −** buttons above a slim fader. Drag the fader for quick moves, or double-tap it to reset to 0.
+  The engine turns the 10 points into a smooth 31-band curve (log-frequency interpolation).
+  Curves and presets saved by 1.0/1.1 (7 bands) are converted automatically when you update.
 - **Live frequency-response graph** of what is actually applied (bands + bass/treble/loudness + preamp).
 - **Preamp** (−12…+6 dB) with **Auto headroom**, which automatically lowers the level by the largest boost so the EQ never adds clipping.
 - **Clipping warning** whenever the settings can push peaks above 0 dB.
@@ -58,7 +59,7 @@ tells Android which audio session it is playing on. Spotify and most music playe
 Requirements: JDK 17+ (Android Studio's bundled JBR works) and the Android SDK with platform 35.
 
 ```bash
-./gradlew :app:testDebugUnitTest      # 36 unit tests
+./gradlew :app:testDebugUnitTest      # 41 unit tests
 ./gradlew :app:assembleDebug          # app/build/outputs/apk/debug/app-debug.apk
 ./gradlew :app:assembleRelease        # app/build/outputs/apk/release/app-release.apk (needs keystore.properties)
 ```
@@ -75,6 +76,10 @@ compileSdk/targetSdk 35, **minSdk 28** (Android 9, required for the Dynamics Pro
 - Updating from **1.0.0**: install 1.1.0 once by hand (it has no updater yet). It installs over 1.0.0 and keeps presets.
 - Android **always asks the user to confirm** an update; apps can't install themselves silently. The first time, Android also asks
   you to allow RDM Eq to "install unknown apps". If a BYD firmware hides that setting, install the APK from the release page via USB instead.
+
+### "Harmful app blocked" (Google Play Protect)
+Devices with Google Play services may warn about or block RDM Eq because it is new and can install its own updates.
+See [docs/PLAY_PROTECT.md](docs/PLAY_PROTECT.md) for why, what 1.2.0 changed, and a ready-to-paste appeal to Google.
 
 ## Signing
 

@@ -192,6 +192,15 @@ Record results in the table at the end. If something fails, open **Status → Di
 
 ---
 
+## 6b. Version 1.2.0 changes
+
+- **10 bands** (31 Hz–16 kHz, ISO octave centres) instead of 7; the DSP curve now uses 31 bands (~1/3 octave).
+  1.x settings, custom presets, edited built-ins and exported preset files (7 values) are resampled to 10 bands so they sound the same.
+  Tested: 1.1.1 → 1.2.0 upgrade on the emulator kept the custom preset "My Old Curve" active, with the Rock shape converted.
+- Slimmer faders with **+ and − both above each band**. Tested in landscape 2560×1600, phone portrait, light and dark.
+- Removed the `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` permission and the unofficial quick-boot action (see docs/PLAY_PROTECT.md).
+- Unit tests: 41 pass. Cross-app processing re-checked (effect attaches to another app's session).
+
 ## 7. In-app updates (added in 1.1.0)
 
 **How it works.** RDM Eq reads the public release list of `github.com/ramyadmin-BYD/RDM-Eq` over HTTPS (no token in the APK).

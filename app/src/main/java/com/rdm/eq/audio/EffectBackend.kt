@@ -10,7 +10,7 @@ data class EngineParams(
 )
 
 enum class BackendKind(val label: String) {
-    DYNAMICS_PROCESSING("Dynamics Processing (7 bands → 24-band DSP)"),
+    DYNAMICS_PROCESSING("Dynamics Processing (10 bands → 31-band DSP)"),
     LEGACY_EQUALIZER("Classic Android Equalizer"),
 }
 

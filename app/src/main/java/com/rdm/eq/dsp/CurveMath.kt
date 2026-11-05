@@ -15,9 +15,10 @@ enum class ClipRisk { NONE, LOW, HIGH }
  */
 object CurveMath {
     // Contribution of each "enhancement" at full strength, per control point.
-    val BASS_SHAPE = floatArrayOf(6f, 4f, 1f, 0f, 0f, 0f, 0f)
-    val TREBLE_SHAPE = floatArrayOf(0f, 0f, 0f, 0f, 1f, 3f, 5f)
-    val LOUDNESS_SHAPE = floatArrayOf(6f, 3f, 0f, 0f, 0f, 1f, 3f)
+    //                                  31   62  125  250  500   1k   2k   4k   8k  16k
+    val BASS_SHAPE = floatArrayOf(      5f,  6f,  4f, 1.5f, 0f,  0f,  0f,  0f,  0f,  0f)
+    val TREBLE_SHAPE = floatArrayOf(    0f,  0f,  0f,  0f,  0f,  0f, 0.5f, 1.5f, 3f,  5f)
+    val LOUDNESS_SHAPE = floatArrayOf(  5f,  6f,  3f,  1f,  0f,  0f,  0f, 0.5f, 1f,  3f)
 
     const val EFFECTIVE_LIMIT_DB = 18f
 
@@ -72,7 +73,7 @@ object CurveMath {
     }
 
     /** Upper band edges for the DynamicsProcessing pre-EQ: [count] log-spaced bands from 20 Hz to 20 kHz. */
-    fun dpBandCutoffs(count: Int = 24, minHz: Float = 20f, maxHz: Float = 20000f): FloatArray {
+    fun dpBandCutoffs(count: Int = 31, minHz: Float = 20f, maxHz: Float = 20000f): FloatArray {
         require(count >= 2)
         val ratio = maxHz / minHz
         return FloatArray(count) { k -> minHz * ratio.pow((k + 1).toFloat() / count) }

@@ -118,9 +118,10 @@ fun StatusScreen(c: EqController, onRequestNotifications: () -> Unit) {
                         Column(Modifier.weight(1f)) { SupportBadge(batteryOk, "Exempt from battery optimisation") }
                         if (!batteryOk) TextButton(onClick = {
                             runCatching {
-                                ctx.startActivity(Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:${ctx.packageName}")))
+                                // Opens the system list; no special permission needed. Pick RDM Eq → "Don't optimise".
+                                ctx.startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
                             }.onFailure { Toast.makeText(ctx, "This head unit does not offer that setting", Toast.LENGTH_LONG).show() }
-                        }) { Text("Request") }
+                        }) { Text("Open settings") }
                     }
                     SupportBadge(if (s.autoStart) null else false,
                         if (s.autoStart) "Auto-start after boot enabled — whether DiLink delivers the boot event is unverified" else "Auto-start after boot is off")
@@ -130,7 +131,7 @@ fun StatusScreen(c: EqController, onRequestNotifications: () -> Unit) {
         val right: @Composable (Modifier) -> Unit = { m ->
             Column(m, verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 SectionCard("Supported audio effects (probed on this unit)") {
-                    SupportBadge(caps.dynamicsProcessing, "Dynamics Processing — 7-band EQ, preamp, limiter, balance")
+                    SupportBadge(caps.dynamicsProcessing, "Dynamics Processing — 10-band EQ, preamp, limiter, balance")
                     SupportBadge(caps.equalizer, "Classic Equalizer — fallback")
                     SupportBadge(caps.bassBoost, "Bass Boost effect (not needed; bass is shaped in the EQ)")
                     SupportBadge(caps.virtualizer, "Virtualizer (not used in a car)")

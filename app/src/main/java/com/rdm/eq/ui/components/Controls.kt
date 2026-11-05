@@ -62,7 +62,10 @@ import kotlin.math.ln
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
-/** Large-target vertical gain fader: drag to adjust (0.5 dB steps), +/- for fine steps, double-tap to reset. */
+/**
+ * Slim vertical gain fader. + and − sit together above the track for 0.5 dB steps,
+ * drag the track for quick moves, double-tap the track to reset.
+ */
 @Composable
 fun VerticalGainSlider(
     value: Float,
@@ -89,18 +92,26 @@ fun VerticalGainSlider(
     }
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
-            if (narrow) EqBands.formatDb(value).removeSuffix(".0") else EqBands.formatDb(value),
-            style = if (narrow) MaterialTheme.typography.labelMedium else MaterialTheme.typography.titleMedium,
+            // Narrow screens: drop the "+" and a trailing ".0" so 10 values fit ("3.5", "-1.5", "4").
+            if (narrow) EqBands.formatDb(value).removePrefix("+").removeSuffix(".0") else EqBands.formatDb(value),
+            style = if (narrow) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelLarge,
+            softWrap = false,
+            fontWeight = FontWeight.SemiBold,
             color = if (value != 0f) accent else cs.onSurfaceVariant,
             maxLines = 1,
         )
-        if (showStepButtons) StepButton("+", enabled) { emit(current + step) }
+        if (showStepButtons) {
+            Spacer(Modifier.height(6.dp))
+            StepButton("+", "Raise $label", enabled && value < max) { emit(current + step) }
+            Spacer(Modifier.height(6.dp))
+            StepButton("−", "Lower $label", enabled && value > min) { emit(current - step) }
+        }
         Box(
             Modifier
                 .weight(1f)
-                .widthIn(max = 64.dp)
+                .widthIn(max = 48.dp)
                 .fillMaxWidth()
-                .padding(vertical = 6.dp)
+                .padding(vertical = 8.dp)
                 .pointerInput(enabled, min, max) {
                     if (!enabled) return@pointerInput
                     detectVerticalDragGestures(onDragStart = { acc = current }) { change, dy ->
@@ -120,47 +131,49 @@ fun VerticalGainSlider(
                 },
         ) {
             Canvas(Modifier.fillMaxSize()) {
-                val trackW = 10.dp.toPx()
-                val thumbR = 15.dp.toPx()
+                val trackW = 4.dp.toPx()
+                val thumbR = 10.dp.toPx()
                 val top = thumbR; val bottom = size.height - thumbR
                 fun y(db: Float) = bottom - (db - min) / (max - min) * (bottom - top)
                 val cx = size.width / 2
                 drawRoundRect(cs.surfaceVariant, Offset(cx - trackW / 2, top), Size(trackW, bottom - top), CornerRadius(trackW / 2))
-                // tick marks every 6 dB
+                // ticks every 6 dB
                 var t = (min / 6f).toInt() * 6f
                 while (t <= max) {
                     val ty = y(t)
-                    drawLine(cs.outline, Offset(cx - trackW * 1.6f, ty), Offset(cx - trackW * 0.9f, ty), 1.dp.toPx())
-                    drawLine(cs.outline, Offset(cx + trackW * 0.9f, ty), Offset(cx + trackW * 1.6f, ty), 1.dp.toPx())
+                    drawLine(cs.outlineVariant, Offset(cx - 9.dp.toPx(), ty), Offset(cx - 5.dp.toPx(), ty), 1.dp.toPx())
+                    drawLine(cs.outlineVariant, Offset(cx + 5.dp.toPx(), ty), Offset(cx + 9.dp.toPx(), ty), 1.dp.toPx())
                     t += 6f
                 }
                 val zero = y(0f.coerceIn(min, max)); val vy = y(value)
-                drawRoundRect(
-                    Brush.verticalGradient(listOf(accent, accent.copy(alpha = 0.55f))),
-                    Offset(cx - trackW / 2, minOf(zero, vy)), Size(trackW, kotlin.math.abs(zero - vy)), CornerRadius(trackW / 2),
-                )
-                drawLine(cs.onSurfaceVariant, Offset(cx - trackW * 1.6f, zero), Offset(cx + trackW * 1.6f, zero), 2.dp.toPx())
+                drawRoundRect(accent, Offset(cx - trackW / 2, minOf(zero, vy)), Size(trackW, kotlin.math.abs(zero - vy)), CornerRadius(trackW / 2))
+                drawLine(cs.onSurfaceVariant.copy(alpha = 0.7f), Offset(cx - 9.dp.toPx(), zero), Offset(cx + 9.dp.toPx(), zero), 1.5.dp.toPx())
+                drawCircle(accent.copy(alpha = 0.18f), thumbR * 1.6f, Offset(cx, vy))
                 drawCircle(accent, thumbR, Offset(cx, vy))
-                drawCircle(cs.surface, thumbR * 0.45f, Offset(cx, vy))
+                drawCircle(cs.surface, thumbR * 0.42f, Offset(cx, vy))
             }
         }
-        if (showStepButtons) StepButton("−", enabled) { emit(current - step) }
-        Spacer(Modifier.height(4.dp))
-        Text(label, style = if (narrow) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold, maxLines = 1)
-        if (!narrow) Text(sublabel, style = MaterialTheme.typography.labelMedium, color = cs.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(label, style = if (narrow) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, maxLines = 1)
+        if (!narrow) Text(sublabel, style = MaterialTheme.typography.labelSmall, color = cs.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
+/** Compact round +/− button; 40 dp keeps it easy to hit in a car. */
 @Composable
-private fun StepButton(text: String, enabled: Boolean, onClick: () -> Unit) {
+private fun StepButton(text: String, description: String, enabled: Boolean, onClick: () -> Unit) {
+    val cs = MaterialTheme.colorScheme
     Box(
         Modifier
-            .size(44.dp)
+            .size(40.dp)
             .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .clickable(enabled = enabled, onClick = onClick),
+            .background(cs.surfaceVariant)
+            .border(1.dp, cs.outlineVariant, CircleShape)
+            .clickable(enabled = enabled, onClick = onClick)
+            .semantics { contentDescription = description },
         contentAlignment = Alignment.Center,
-    ) { Text(text, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface) }
+    ) {
+        Text(text, style = MaterialTheme.typography.titleLarge, color = if (enabled) cs.onSurface else cs.onSurfaceVariant.copy(alpha = 0.5f))
+    }
 }
 
 @Composable
@@ -180,7 +193,7 @@ fun StatusPill(text: String, color: Color, modifier: Modifier = Modifier) {
 }
 
 /**
- * Frequency response of what is actually applied (effective curve + preamp). The 7 control points
+ * Frequency response of what is actually applied (effective curve + preamp). The 10 band points
  * sit above the centres of the 7 fader columns; spacing between them is logarithmic.
  */
 @Composable

@@ -13,7 +13,7 @@ import org.junit.Test
 class PresetRepositoryTest {
     private var n = 0
     private fun repo(store: InMemoryStore = InMemoryStore()) = PresetRepository(store) { "c_${n++}" }
-    private val curve = listOf(1f, 2f, 3f, 4f, 5f, 6f, 7f)
+    private val curve = listOf(1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f)
 
     @Test fun builtInLibraryIsComplete() {
         val names = BuiltInPresets.all.map { it.name }
@@ -64,8 +64,8 @@ class PresetRepositoryTest {
     }
 
     @Test fun gainsAreNormalisedOnSave() {
-        val p = repo().saveCustom("x", listOf(30f, -30f, 1.26f, 0f, 0f, 0f, 0f))
-        assertEquals(listOf(12f, -12f, 1.5f, 0f, 0f, 0f, 0f), p.gains)
+        val p = repo().saveCustom("x", listOf(30f, -30f, 1.26f, 0f, 0f, 0f, 0f, 0f, 0f, 0f))
+        assertEquals(listOf(12f, -12f, 1.5f, 0f, 0f, 0f, 0f, 0f, 0f, 0f), p.gains)
     }
 
     @Test fun exportImportRoundTrip() {
@@ -91,6 +91,27 @@ class PresetRepositoryTest {
         val r = repo(store)
         assertTrue(r.customs().isEmpty())
         assertEquals(BuiltInPresets.all.size, r.builtIns().size)
+    }
+
+    @Test fun customPresetsFromVersion1AreConverted() {
+        // Exactly what RDM Eq 1.1 stored: 7 gains per preset, and a 7-band built-in override.
+        val store = InMemoryStore().apply {
+            map["custom_presets_v1"] = "[{\"id\":\"c_old\",\"name\":\"Old Car\",\"gains\":[6,3,0,-3,0,2,4]}]"
+            map["builtin_overrides_v1"] = "{\"rock\":[1,1,1,1,1,1,1]}"
+        }
+        val r = repo(store)
+        val old = r.find("c_old")!!
+        assertEquals("Old Car", old.name)
+        assertEquals(10, old.gains.size)
+        assertEquals(6f, old.gains[0], 1e-4f); assertEquals(-3f, old.gains[5], 1e-4f); assertEquals(4f, old.gains[9], 1e-4f)
+        assertEquals(List(10) { 1f }, r.find("rock")!!.gains)
+    }
+
+    @Test fun importsSevenBandExportFiles() {
+        val json = "{\"format\":\"rdm-eq-presets\",\"version\":1,\"custom\":[{\"name\":\"Legacy\",\"gains\":[0,0,0,0,0,0,0]}]}"
+        val r = repo()
+        assertEquals(1, r.importJson(json).customsAdded)
+        assertEquals(EqBands.flat(), r.customs().single().gains)
     }
 
     @Test fun resetAllClearsEverything() {

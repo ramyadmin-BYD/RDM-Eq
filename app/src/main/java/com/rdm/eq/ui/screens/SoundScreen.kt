@@ -48,17 +48,17 @@ fun SoundScreen(c: EqController) {
         val cards: List<@Composable (Modifier) -> Unit> = listOf(
             { m ->
                 SectionCard("Bass boost", m) {
-                    Text("Adds up to +6 dB at 60 Hz and +4 dB at 150 Hz. Very low (subsonic) frequencies are tapered to protect the speakers.",
+                    Text("Adds up to +6 dB at 62 Hz, +5 dB at 31 Hz and +4 dB at 125 Hz. Very low (subsonic) frequencies are tapered to protect the speakers.",
                         style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    LabeledSlider("Amount", s.bassBoost, "+${EqBands.formatDb(s.bassBoost * 6f).trimStart('+')} dB @ 60 Hz", s.enabled, c::setBassBoost)
+                    LabeledSlider("Amount", s.bassBoost, "+${EqBands.formatDb(s.bassBoost * 6f).trimStart('+')} dB @ 62 Hz", s.enabled, c::setBassBoost)
                     SupportBadge(true, "Applied by the EQ engine (no separate BassBoost effect needed)")
                 }
             },
             { m ->
                 SectionCard("Treble enhancement", m) {
-                    Text("Adds up to +5 dB at 15 kHz and +3 dB at 6 kHz for detail and air.",
+                    Text("Adds up to +5 dB at 16 kHz and +3 dB at 8 kHz for detail and air.",
                         style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    LabeledSlider("Amount", s.trebleBoost, "+${EqBands.formatDb(s.trebleBoost * 5f).trimStart('+')} dB @ 15 kHz", s.enabled, c::setTrebleBoost)
+                    LabeledSlider("Amount", s.trebleBoost, "+${EqBands.formatDb(s.trebleBoost * 5f).trimStart('+')} dB @ 16 kHz", s.enabled, c::setTrebleBoost)
                     SupportBadge(true, "Applied by the EQ engine")
                 }
             },

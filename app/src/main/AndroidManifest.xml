@@ -10,8 +10,6 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- Optional automatic start after the head unit boots. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <!-- Lets the user exempt RDM Eq from battery optimisation (system dialog). -->
-    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <!-- Used ONLY by the in-app updater to read GitHub Releases over HTTPS. The equalizer itself works offline. -->
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Lets RDM Eq hand a downloaded, verified update to Android's installer (the user always confirms). -->
@@ -71,7 +69,6 @@
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
-                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
         <!-- Results of the update install session (not exported). -->

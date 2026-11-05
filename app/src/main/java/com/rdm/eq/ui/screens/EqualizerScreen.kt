@@ -126,7 +126,7 @@ fun EqualizerScreen(c: EqController) {
                         VerticalGainSlider(
                             value = s.gains[i],
                             onValueChange = { c.setBand(i, it) },
-                            label = if (narrow) EqBands.labels[i].removeSuffix(" Hz").removeSuffix(" kHz").let { l -> if (EqBands.frequenciesHz[i] >= 1000f) l + "k" else l } else EqBands.labels[i],
+                            label = if (narrow) EqBands.shortLabels[i] else EqBands.labels[i],
                             sublabel = EqBands.roles[i],
                             enabled = s.enabled,
                             showStepButtons = !compact && !narrow,

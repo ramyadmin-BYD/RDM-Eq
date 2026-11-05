@@ -41,8 +41,7 @@ class SettingsRepository(private val store: KeyValueStore) {
     internal fun fromJson(o: JSONObject): AudioSettings {
         val d = AudioSettings()
         val gArr = o.optJSONArray("gains")
-        val gains = if (gArr != null && gArr.length() == EqBands.COUNT)
-            EqBands.normalize(List(EqBands.COUNT) { gArr.optDouble(it, 0.0).toFloat() }) else d.gains
+        val gains = gArr?.let { a -> EqBands.fromStored(List(a.length()) { a.optDouble(it, 0.0).toFloat() }) } ?: d.gains
         return AudioSettings(
             enabled = o.optBoolean("enabled", d.enabled),
             gains = gains,

@@ -6,7 +6,7 @@ import kotlin.math.abs
 
 /**
  * Main engine: Android's DynamicsProcessing effect (API 28+).
- * The 7 control points are interpolated onto 24 log-spaced pre-EQ bands for a smooth curve,
+ * The 10 bands are interpolated onto 31 log-spaced (about 1/3-octave) pre-EQ bands for a smooth curve,
  * with a master input gain (preamp / balance) and an output limiter.
  */
 class DynamicsProcessingBackend(override val sessionId: Int, priority: Int) : EffectBackend {
@@ -81,5 +81,5 @@ class DynamicsProcessingBackend(override val sessionId: Int, priority: Int) : Ef
 
     override fun release() = runCatching { dp.release() }.let { }
 
-    companion object { const val BANDS = 24 }
+    companion object { const val BANDS = 31 }
 }

@@ -15,9 +15,9 @@ data class AudioSettings(
     val activePresetId: String = BuiltInPresets.FLAT_ID,
     val autoHeadroom: Boolean = true,
     val preampDb: Float = 0f,
-    /** 0..1, adds up to +6 dB at 60 Hz. */
+    /** 0..1, adds up to +6 dB at 62 Hz. */
     val bassBoost: Float = 0f,
-    /** 0..1, adds up to +5 dB at 15 kHz. */
+    /** 0..1, adds up to +5 dB at 16 kHz. */
     val trebleBoost: Float = 0f,
     val loudness: Boolean = false,
     /** -1 (left) .. +1 (right). */

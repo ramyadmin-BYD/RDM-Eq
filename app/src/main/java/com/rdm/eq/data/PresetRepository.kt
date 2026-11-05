@@ -135,15 +135,16 @@ class PresetRepository(
 
     private fun presetToJson(p: Preset) = JSONObject().put("id", p.id).put("name", p.name).put("gains", gainsToJson(p.gains))
     private fun gainsToJson(g: List<Float>) = JSONArray().apply { g.forEach { put(it.toDouble()) } }
+    /** Reads 10-band curves, and 7-band curves saved by RDM Eq 1.0–1.1 (converted to 10 bands). */
     private fun jsonToGains(a: JSONArray?): List<Float>? {
-        if (a == null || a.length() != EqBands.COUNT) return null
-        val out = ArrayList<Float>(EqBands.COUNT)
+        if (a == null) return null
+        val out = ArrayList<Float>(a.length())
         for (i in 0 until a.length()) {
             val d = a.optDouble(i, Double.NaN)
             if (d.isNaN()) return null
             out.add(d.toFloat())
         }
-        return EqBands.normalize(out)
+        return EqBands.fromStored(out)
     }
 
     private fun persistCustoms() =
