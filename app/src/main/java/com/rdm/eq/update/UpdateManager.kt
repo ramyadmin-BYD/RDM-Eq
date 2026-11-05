@@ -315,9 +315,19 @@ class UpdateManager(private val context: Context) {
         val update = currentUpdate() ?: return
         when (status) {
             PackageInstaller.STATUS_SUCCESS -> DiagLog.i("Update installed")
-            PackageInstaller.STATUS_FAILURE_ABORTED -> finishedFile(update).takeIf { it.exists() }?.let {
-                _state.value = UpdateState.ReadyToInstall(update, it)
+            PackageInstaller.STATUS_FAILURE_ABORTED -> when {
+                // Blocked by the device's security scanner (e.g. Google Play Protect), not by the user.
+                message?.contains("VERIFICATION", ignoreCase = true) == true -> _state.value = UpdateState.Failed(
+                    "This device's security check (for example Google Play Protect) blocked the update. " +
+                        "Your current version keeps working. You can install it from github.com/${BuildConfig.UPDATE_REPO}/releases instead.",
+                    UpdateException.Kind.INSTALL, update,
+                )
+                else -> finishedFile(update).takeIf { it.exists() }?.let { _state.value = UpdateState.ReadyToInstall(update, it) }
             }
+            PackageInstaller.STATUS_FAILURE_BLOCKED -> _state.value = UpdateState.Failed(
+                "This head unit does not allow apps to install updates. Install the APK from github.com/${BuildConfig.UPDATE_REPO}/releases via USB instead.",
+                UpdateException.Kind.INSTALL, update,
+            )
             else -> _state.value = UpdateState.Failed(
                 "Installation failed${message?.let { ": $it" } ?: ""}", UpdateException.Kind.INSTALL, update,
             )

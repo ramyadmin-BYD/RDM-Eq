@@ -190,6 +190,58 @@ Record results in the table at the end. If something fails, open **Status → Di
 | 10 Loudness follows knob | |
 | 11 Clipping | |
 
+---
+
+## 7. In-app updates (added in 1.1.0)
+
+**How it works.** RDM Eq reads the public release list of `github.com/ramyadmin-BYD/RDM-Eq` over HTTPS (no token in the APK).
+It ignores drafts, ignores pre-releases unless "Include beta versions" is on, and requires each release to carry
+`rdm-eq-update.json` (version, APK name, SHA-256, size, signing-certificate fingerprint). It offers a release only if it
+is for `com.rdm.eq`, has a higher `versionCode`, and names the **same signing certificate** as the installed app.
+After download, size, SHA-256, GitHub's own asset digest, package name, version and signing certificate are checked
+again. Then Android's **PackageInstaller** opens its own confirmation; the user always confirms. If that API fails, RDM Eq falls back to the
+system installer intent. Nothing is uninstalled; app data (presets, settings) stays because it is an in-place update.
+
+**Android rules that apply (not limitations of RDM Eq):**
+- An ordinary app **cannot update itself silently**. Android always shows "Update this app?".
+- The first time, Android asks you to allow RDM Eq to **"Install unknown apps"**. If BYD's firmware hides that setting
+  or blocks app-initiated installs, RDM Eq says so and points to the manual USB install. *Unverified on DiLink.*
+- **Google Play Protect** (only on devices with Google Play services) may scan or **block** updates from unknown developers.
+  On the Google Play emulator it blocked the release build as "potentially harmful", a known false-positive pattern for
+  self-updating sideloaded apps. RDM Eq then explains this and links to the release page. If your head unit shows this, install the APK
+  from GitHub by USB, and/or submit the app for review through Google's Play Protect appeal form. Many BYD units have no Play Protect. *Unverified on DiLink.*
+- Android does not reopen an app after it updates itself. RDM Eq posts an "RDM Eq updated – tap to open" notification, and the engine restarts on its own.
+- Users on **1.0.0** must install 1.1.x once by hand (1.0.0 has no updater). Same key, so it installs over 1.0.0 and keeps presets.
+
+### Update tests (Android 17 emulator, 5 Nov 2026)
+
+| Test | Result |
+|---|---|
+| Existing app builds; 36 unit tests (10 new for release parsing/validation) | ✅ |
+| Equalizer still processes audio after the changes (effect attaches, presets apply) | ✅ (release smoke test; audio engine code unchanged) |
+| About screen: developer card first, version/build read from the installed package, light and dark | ✅ |
+| Update found on a **live GitHub release** (v1.1.0) by the automatic start-up check, with version, date and notes | ✅ |
+| "No update available" → "You're using the latest version of RDM Eq." | ✅ |
+| Later → no automatic re-prompt for that version | ✅ |
+| Network failure (server down), HTTP 500, malformed release list, malformed metadata | ✅ clear message, no crash |
+| Draft-only and pre-release-only releases ignored when beta is off | ✅ |
+| Interrupted download → partial file kept → **resumed** with an HTTP Range request → verified | ✅ |
+| Tampered APK (checksum mismatch) refused and deleted | ✅ |
+| APK signed with a different key refused and deleted | ✅ |
+| Stale earlier download re-verified against new metadata and discarded | ✅ |
+| Duplicate downloads prevented (single download job) | ✅ by design; no second job starts while one is active |
+| "Install unknown apps" permission flow → returns and continues automatically | ✅ |
+| Android "Update this app?" → Cancel → back to Install | ✅ |
+| **Full in-app update installed** (test build 1 → 5) with custom preset, edited curve and settings **kept**; "updated" notification; engine restarted | ✅ |
+| Live GitHub release installed in-app on the emulator | ⚠️ Downloaded and verified, then **blocked by Google Play Protect** on the Google Play emulator image; RDM Eq showed the explanation and kept working |
+| **Update on the BYD head unit** | ❌ Not tested: no access to the car |
+
+### Vehicle test for updates
+12. Settings → Updates → **Check for Updates**: is the latest version shown?
+13. **Update Now** → does Android show "Install unknown apps" for RDM Eq? Allow it. Does "Update this app?" appear? Tap **Update**.
+14. After the update: open RDM Eq from the notification. About shows the new version, and your preset and custom presets are still there.
+15. If any step is blocked, note the exact message. The fallback is installing the APK from the GitHub release page via USB.
+
 ## Sources
 
 - [DiAuto install guide (tested on BYD DiLink 5.1, Android 13)](https://github.com/shihabal3amri/DiAuto/blob/main/docs/INSTALL.md)

@@ -36,7 +36,7 @@ import com.rdm.eq.ui.theme.RdmColors
 
 /** GitHub release notes are Markdown; show them as clean plain text. */
 fun cleanNotes(md: String): String = md.lines()
-    .dropWhile { it.isBlank() || it.trim().trimStart('#').trim().equals("What's new", ignoreCase = true) }
+    .dropWhile { it.isBlank() || it.trim().trimStart('#').trim().startsWith("What's new", ignoreCase = true) }
     .joinToString("\n") { l ->
     l.trimEnd()
         .replace(Regex("^#{1,6}\\s*"), "")
