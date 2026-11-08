@@ -43,6 +43,13 @@ object EqBands {
             if (k == k.toInt().toFloat()) "${k.toInt()} kHz" else String.format(java.util.Locale.US, "%.1f kHz", k)
         } else "${hz.toInt()} Hz"
 
+    /** Band value as RDM Player shows it ("+3", "-2", "+0"), keeping a half step when there is one ("+2.5"). */
+    fun formatBandDb(db: Float): String {
+        val r = Math.round(db * 2) / 2f
+        return if (r == r.toInt().toFloat()) String.format(java.util.Locale.ROOT, "%+.0f", r + 0f)
+        else String.format(java.util.Locale.ROOT, "%+.1f", r)
+    }
+
     fun formatDb(db: Float): String = when {
         db > 0.04f -> String.format(java.util.Locale.US, "+%.1f", db)
         db < -0.04f -> String.format(java.util.Locale.US, "%.1f", db)

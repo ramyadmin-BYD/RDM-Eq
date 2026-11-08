@@ -16,6 +16,12 @@ class DebugControlReceiver : BroadcastReceiver() {
             "preset" -> c.applyPreset(arg)
             "band" -> arg.split(":").takeIf { it.size == 2 }?.let { (i, db) -> c.setBand(i.toInt(), db.toFloat()) }
             "autoHeadroom" -> c.setAutoHeadroom(arg != "false")
+            "loudnessGain" -> c.setLoudnessGain(arg.toFloat())
+            "normalization" -> c.setNormalization(arg != "false")
+            "bass" -> c.setBassBoost(arg.toFloat())
+            "treble" -> c.setTrebleBoost(arg.toFloat())
+            "limiter" -> c.setLimiter(arg != "false")
+            "theme" -> c.setTheme(com.rdm.eq.model.ThemeMode.valueOf(arg))
             "engine" -> c.setEngine(com.rdm.eq.model.EnginePreference.valueOf(arg))
             "global" -> c.setGlobalMode(arg != "false")
             // Update testing: arg "http://10.0.2.2:8765|owner/repo" or "reset"; "updateCheck" runs a manual check.
@@ -25,6 +31,7 @@ class DebugControlReceiver : BroadcastReceiver() {
             }
             "updateCheck" -> RdmEqApp.updates(context).check(manual = true)
         }
-        DiagLog.i("debug cmd ${intent.getStringExtra("cmd")} $arg → ${c.status.value.activeSessions} active, update=${RdmEqApp.updates(context).state.value}")
+        DiagLog.i("debug cmd ${intent.getStringExtra("cmd")} $arg → ${c.status.value.activeSessions} active, update=${RdmEqApp.updates(context).state.value}; " +
+            c.status.value.sessions.joinToString { "#${it.sessionId} ready=${it.ready} norm=${it.supportsNormalization} ${it.detail}" })
     }
 }

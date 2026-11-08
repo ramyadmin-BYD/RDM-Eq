@@ -10,17 +10,19 @@ import kotlin.math.sqrt
 enum class ClipRisk { NONE, LOW, HIGH }
 
 /**
- * Pure maths that turns the 7 user control points into what each audio backend needs.
+ * Pure maths that turns the 10 user control points into what each audio backend needs.
  * Kept free of Android classes so it is covered by JVM unit tests.
  */
 object CurveMath {
     // Contribution of each "enhancement" at full strength, per control point.
-    //                                  31   62  125  250  500   1k   2k   4k   8k  16k
-    val BASS_SHAPE = floatArrayOf(      5f,  6f,  4f, 1.5f, 0f,  0f,  0f,  0f,  0f,  0f)
-    val TREBLE_SHAPE = floatArrayOf(    0f,  0f,  0f,  0f,  0f,  0f, 0.5f, 1.5f, 3f,  5f)
-    val LOUDNESS_SHAPE = floatArrayOf(  5f,  6f,  3f,  1f,  0f,  0f,  0f, 0.5f, 1f,  3f)
+    // Bass and treble match RDM Player exactly (8 dB × its shelf shapes).
+    //                                  31    62    125   250   500   1k    2k    4k    8k    16k
+    val BASS_SHAPE = floatArrayOf(      8f,  7.2f, 4.8f, 2.4f, 0.8f, 0f,   0f,   0f,   0f,   0f)
+    val TREBLE_SHAPE = floatArrayOf(    0f,   0f,   0f,   0f,   0f,  0.8f, 2.4f, 4.8f, 7.2f, 8f)
+    val LOUDNESS_SHAPE = floatArrayOf(  5f,   6f,   3f,   1f,   0f,   0f,   0f,  0.5f, 1f,   3f)
 
-    const val EFFECTIVE_LIMIT_DB = 18f
+    /** Same ceiling as RDM Player's effectiveBands(). */
+    const val EFFECTIVE_LIMIT_DB = 15f
 
     /** Gain at [freqHz]: linear interpolation on a log-frequency axis, flat beyond the end points. */
     fun interpolate(freqHz: Float, gains: List<Float>, freqs: FloatArray = EqBands.frequenciesHz): Float {
@@ -52,6 +54,13 @@ object CurveMath {
             g.coerceIn(-EFFECTIVE_LIMIT_DB, EFFECTIVE_LIMIT_DB)
         }
     }
+
+    /**
+     * Make-up gain for "Loudness". It is only applied while the limiter is on, because it relies on the
+     * limiter to hold peaks below -1 dBFS (the same idea as Android's LoudnessEnhancer).
+     */
+    fun loudnessGain(s: AudioSettings): Float =
+        if (s.limiter) s.loudnessGainDb.coerceIn(0f, AudioSettings.LOUDNESS_GAIN_MAX) else 0f
 
     /** Negative preamp that cancels the largest boost, so the curve never adds level. */
     fun autoPreamp(effective: List<Float>): Float = -max(0f, effective.maxOrNull() ?: 0f)

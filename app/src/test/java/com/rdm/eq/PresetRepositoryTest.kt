@@ -18,7 +18,7 @@ class PresetRepositoryTest {
     @Test fun builtInLibraryIsComplete() {
         val names = BuiltInPresets.all.map { it.name }
         listOf("Flat", "BYD Factory Sound Reference", "Balanced", "Pop", "Rock", "Jazz", "Classical", "Acoustic",
-            "Vocal Clarity", "Podcast and Speech", "Hip-Hop", "EDM", "Deep Bass", "Bass Punch", "Treble Clarity",
+            "Vocal", "Electronic", "Bass Boost", "Treble Boost", "Podcast and Speech", "Hip-Hop", "EDM", "Deep Bass", "Bass Punch", "Treble Clarity",
             "Night Driving", "Highway Driving", "Audiophile").forEach { assertTrue("missing $it", it in names) }
         BuiltInPresets.all.forEach { p ->
             assertEquals(EqBands.COUNT, p.gains.size)

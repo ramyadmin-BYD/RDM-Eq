@@ -22,20 +22,25 @@ tells Android which audio session it is playing on. Spotify and most music playe
 
 ## Features
 
+Since 1.3.0 the equalizer matches **RDM Player**'s equalizer (layout, faders, presets, enhancement curves),
+but keeps RDM Eq's own engine that works on other apps' audio. See [docs/EQUALIZER_SYNC.md](docs/EQUALIZER_SYNC.md).
+
 - **Ten bands** at 31, 62, 125, 250, 500 Hz, 1, 2, 4, 8 and 16 kHz, from −12 to +12 dB in 0.5 dB steps.
-  Each band has **+ / −** buttons above a slim fader. Drag the fader for quick moves, or double-tap it to reset to 0.
+  Each band has **+ / −** buttons above an RDM Player-style fader. Drag or tap the fader to set it, double-tap it to reset to 0.
   The engine turns the 10 points into a smooth 31-band curve (log-frequency interpolation).
   Curves and presets saved by 1.0/1.1 (7 bands) are converted automatically when you update.
 - **Live frequency-response graph** of what is actually applied (bands + bass/treble/loudness + preamp).
-- **Preamp** (−12…+6 dB) with **Auto headroom**, which automatically lowers the level by the largest boost so the EQ never adds clipping.
+- **Preamp** (−12…+12 dB) with **Auto headroom**, which automatically lowers the level by the largest boost so the EQ never adds clipping.
 - **Clipping warning** whenever the settings can push peaks above 0 dB.
 - **Limiter** at −1 dBFS (Dynamics Processing engine).
-- **Bass boost** (up to +6 dB at 60 Hz, with subsonic protection below 30 Hz) and **treble enhancement** (up to +5 dB at 15 kHz).
+- **Bass enhancement** (0–100 %, up to +8 dB at 31 Hz; content below 30 Hz is tapered to protect speakers) and
+  **treble enhancement** (0–100 %, up to +8 dB at 16 kHz). Same curves as RDM Player.
+- **Loudness** (0 to +10 dB of gain held under the limiter) and **Volume normalization** (gentle compressor). Dynamics Processing engine only.
 - **Loudness compensation** that follows Android's media volume (see limitations).
 - **Left/right balance** on stereo streams. It only ever turns one side down.
-- **18 built-in presets**: Flat, BYD Factory Sound Reference (neutral; does not imitate BYD's unpublished DSP), Balanced, Pop, Rock, Jazz,
-  Classical, Acoustic, Vocal Clarity, Podcast and Speech, Hip-Hop, EDM, Deep Bass, Bass Punch, Treble Clarity, Night Driving,
-  Highway Driving, Audiophile.
+- **21 built-in presets**: RDM Player's eleven with identical values (Flat, Rock, Pop, Jazz, Classical, Electronic, Hip-Hop,
+  Vocal, Acoustic, Bass Boost, Treble Boost), then RDM Eq's in-car presets: BYD Factory Sound Reference (neutral; does not imitate
+  BYD's unpublished DSP), Balanced, Podcast and Speech, EDM, Deep Bass, Bass Punch, Treble Clarity, Night Driving, Highway Driving, Audiophile.
 - Edit any preset, save it back, and **restore** built-ins to their originals. **Custom presets** can be saved, renamed and deleted.
   **Export/import** presets as JSON (e.g. via USB stick).
 - **Settings persist** across app restarts and reboots. You can choose a default startup preset or keep the last used one.
@@ -59,7 +64,7 @@ tells Android which audio session it is playing on. Spotify and most music playe
 Requirements: JDK 17+ (Android Studio's bundled JBR works) and the Android SDK with platform 35.
 
 ```bash
-./gradlew :app:testDebugUnitTest      # 41 unit tests
+./gradlew :app:testDebugUnitTest      # 47 unit tests
 ./gradlew :app:assembleDebug          # app/build/outputs/apk/debug/app-debug.apk
 ./gradlew :app:assembleRelease        # app/build/outputs/apk/release/app-release.apk (needs keystore.properties)
 ```

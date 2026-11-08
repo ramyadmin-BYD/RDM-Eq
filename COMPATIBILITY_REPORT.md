@@ -201,6 +201,21 @@ Record results in the table at the end. If something fails, open **Status → Di
 - Removed the `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` permission and the unofficial quick-boot action (see docs/PLAY_PROTECT.md).
 - Unit tests: 41 pass. Cross-app processing re-checked (effect attaches to another app's session).
 
+## 6c. Version 1.3.0: equalizer synchronized with RDM Player
+
+Reference: RDM Player 1.4.0 (`ramyadmin-BYD/RDM-Player`, commit 3990481). Details: docs/EQUALIZER_SYNC.md.
+
+- Layout, fader drawing, preset chips, the eleven presets and their values, and the bass/treble enhancement curves now match RDM Player.
+- Added **Loudness** (0–10 dB input gain under the limiter) and **Volume normalization** (one-band DynamicsProcessing compressor
+  with RDM Player's parameters). If a unit refuses the compressor stage, the engine falls back to EQ + limiter and the switch is disabled.
+- Not ported: Mono and ReplayGain. Both need access to the audio samples or file tags inside the playing app.
+- Tests (Android emulator, 9 Nov 2026):
+  - 47 unit tests pass, including 6 that compare values with RDM Player's source.
+  - With the test player's audio session attached, every control (presets, bands, bass, treble, loudness, normalization, limiter, auto headroom) was read back from the native effect: `ready=true` on both sessions after each change.
+  - The emulator's Visualizer meter saturated, so audible dB changes were **not** measured acoustically.
+  - Settings persisted across a force-stop and restart.
+  - Upgrading from published 1.2.0 to the signed 1.3.0: an unedited Rock moved to the new values, the custom preset was kept, no uninstall.
+
 ## 7. In-app updates (added in 1.1.0)
 
 **How it works.** RDM Eq reads the public release list of `github.com/ramyadmin-BYD/RDM-Eq` over HTTPS (no token in the APK).

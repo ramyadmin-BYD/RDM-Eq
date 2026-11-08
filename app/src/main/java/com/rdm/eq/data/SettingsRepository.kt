@@ -28,6 +28,8 @@ class SettingsRepository(private val store: KeyValueStore) {
         put("bassBoost", s.bassBoost.toDouble())
         put("trebleBoost", s.trebleBoost.toDouble())
         put("loudness", s.loudness)
+        put("loudnessGainDb", s.loudnessGainDb.toDouble())
+        put("normalization", s.normalization)
         put("balance", s.balance.toDouble())
         put("limiter", s.limiter)
         put("sessionMode", s.sessionMode)
@@ -52,6 +54,8 @@ class SettingsRepository(private val store: KeyValueStore) {
             bassBoost = o.optDouble("bassBoost", 0.0).toFloat().coerceIn(0f, 1f),
             trebleBoost = o.optDouble("trebleBoost", 0.0).toFloat().coerceIn(0f, 1f),
             loudness = o.optBoolean("loudness", d.loudness),
+            loudnessGainDb = o.optDouble("loudnessGainDb", 0.0).toFloat().coerceIn(0f, AudioSettings.LOUDNESS_GAIN_MAX),
+            normalization = o.optBoolean("normalization", d.normalization),
             balance = o.optDouble("balance", 0.0).toFloat().coerceIn(-1f, 1f),
             limiter = o.optBoolean("limiter", d.limiter),
             sessionMode = o.optBoolean("sessionMode", d.sessionMode),

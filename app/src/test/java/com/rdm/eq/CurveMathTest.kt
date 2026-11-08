@@ -28,8 +28,9 @@ class CurveMathTest {
     @Test fun bassAndTrebleBoostAddShapes() {
         val s = AudioSettings(gains = EqBands.flat(), bassBoost = 1f, trebleBoost = 0.5f)
         val e = CurveMath.effectiveGains(s, null)
-        assertEquals(6f, e[1], 1e-4f); assertEquals(4f, e[2], 1e-4f); assertEquals(0f, e[5], 1e-4f)
-        assertEquals(2.5f, e[9], 1e-4f)
+        assertEquals(8f, e[0], 1e-4f); assertEquals(7.2f, e[1], 1e-4f); assertEquals(4.8f, e[2], 1e-4f)
+        assertEquals(0f, e[5] - 0.4f, 1e-4f) // treble 0.5 × 0.8 dB at 1 kHz
+        assertEquals(4f, e[9], 1e-4f)
     }
 
     @Test fun loudnessOnlyWhenEnabledAndVolumeKnown() {

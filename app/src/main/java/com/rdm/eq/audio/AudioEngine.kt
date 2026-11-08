@@ -17,6 +17,7 @@ data class SessionStatus(
     val error: String?,
     /** Whether audio is currently playing on this session: true/false, or null when Android doesn't say. */
     val playing: Boolean? = null,
+    val supportsNormalization: Boolean = false,
 ) {
     /** True only when the effect exists, owns control, is enabled and its parameters were read back. */
     val ready get() = backend != null && hasControl && enabled && verified && error == null
@@ -185,6 +186,7 @@ class AudioEngine(private val playbackProbe: () -> PlaybackSnapshot? = { null })
         hasControl = backend?.hasControl == true, enabled = backend?.isEnabled == true,
         verified = backend?.verified == true, channelCount = backend?.channelCount ?: 0,
         detail = backend?.detail ?: "", error = error,
+        supportsNormalization = backend?.supportsNormalization == true,
         playing = when {
             snap == null -> null
             id == 0 -> snap.anyMediaPlaying

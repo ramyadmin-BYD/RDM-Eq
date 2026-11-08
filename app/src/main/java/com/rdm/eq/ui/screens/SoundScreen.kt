@@ -47,18 +47,18 @@ fun SoundScreen(c: EqController) {
         val twoCol = maxWidth > 760.dp
         val cards: List<@Composable (Modifier) -> Unit> = listOf(
             { m ->
-                SectionCard("Bass boost", m) {
-                    Text("Adds up to +6 dB at 62 Hz, +5 dB at 31 Hz and +4 dB at 125 Hz. Very low (subsonic) frequencies are tapered to protect the speakers.",
+                SectionCard("Bass enhancement", m) {
+                    Text("Same shelf as RDM Player: up to +8 dB at 31 Hz, +7.2 dB at 62 Hz, +4.8 dB at 125 Hz, fading out by 500 Hz. Content below 30 Hz is tapered to protect the speakers.",
                         style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    LabeledSlider("Amount", s.bassBoost, "+${EqBands.formatDb(s.bassBoost * 6f).trimStart('+')} dB @ 62 Hz", s.enabled, c::setBassBoost)
+                    LabeledSlider("Amount", s.bassBoost, "${(s.bassBoost * 100).roundToInt()} % · +${EqBands.formatDb(s.bassBoost * 8f).trimStart('+')} dB @ 31 Hz", s.enabled, c::setBassBoost)
                     SupportBadge(true, "Applied by the EQ engine (no separate BassBoost effect needed)")
                 }
             },
             { m ->
                 SectionCard("Treble enhancement", m) {
-                    Text("Adds up to +5 dB at 16 kHz and +3 dB at 8 kHz for detail and air.",
+                    Text("Same shelf as RDM Player: up to +8 dB at 16 kHz, +7.2 dB at 8 kHz, +4.8 dB at 4 kHz, starting from 1 kHz.",
                         style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    LabeledSlider("Amount", s.trebleBoost, "+${EqBands.formatDb(s.trebleBoost * 5f).trimStart('+')} dB @ 16 kHz", s.enabled, c::setTrebleBoost)
+                    LabeledSlider("Amount", s.trebleBoost, "${(s.trebleBoost * 100).roundToInt()} % · +${EqBands.formatDb(s.trebleBoost * 8f).trimStart('+')} dB @ 16 kHz", s.enabled, c::setTrebleBoost)
                     SupportBadge(true, "Applied by the EQ engine")
                 }
             },
@@ -130,6 +130,8 @@ fun SoundScreen(c: EqController) {
                         (if (caps.virtualizer) "present on this unit but " else "not present on this unit, and ") +
                         "it has no dependable effect on car cabin speakers, so no control is shown.")
                     SupportBadge(false, "Front/rear fader — not reachable through Android audio-effect APIs; use BYD's own sound settings.")
+                    SupportBadge(false, "Mono playback (in RDM Player) — Android audio effects process each channel separately and can't mix left and right for another app.")
+                    SupportBadge(false, "ReplayGain (in RDM Player) — needs the volume tags inside each music file, which only the playing app can read. Use Volume normalization instead.")
                 }
             },
         )

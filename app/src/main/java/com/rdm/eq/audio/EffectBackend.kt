@@ -1,12 +1,15 @@
 package com.rdm.eq.audio
 
-/** What every backend receives. Gains are the 7 effective control points (after bass/treble/loudness). */
+/** What every backend receives. Gains are the 10 effective control points (after bass/treble/loudness). */
 data class EngineParams(
     val enabled: Boolean,
     val effectiveGains: List<Float>,
     val preampDb: Float,
     val balance: Float,
     val limiter: Boolean,
+    /** Extra input gain held by the limiter (0 when the limiter is off). */
+    val loudnessGainDb: Float = 0f,
+    val normalization: Boolean = false,
 )
 
 enum class BackendKind(val label: String) {
@@ -29,6 +32,9 @@ interface EffectBackend {
     val supportsBalance: Boolean
     val supportsLimiter: Boolean
     val supportsPreamp: Boolean
+    /** Loudness gain needs the limiter; normalization needs the multi-band compressor stage. */
+    val supportsLoudnessGain: Boolean get() = false
+    val supportsNormalization: Boolean get() = false
     fun apply(p: EngineParams)
     fun setControlListener(onChange: () -> Unit)
     fun release()

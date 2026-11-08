@@ -15,11 +15,16 @@ data class AudioSettings(
     val activePresetId: String = BuiltInPresets.FLAT_ID,
     val autoHeadroom: Boolean = true,
     val preampDb: Float = 0f,
-    /** 0..1, adds up to +6 dB at 62 Hz. */
+    /** 0..1 ("Bass enhancement", same shape as RDM Player): up to +8 dB at 31 Hz. */
     val bassBoost: Float = 0f,
-    /** 0..1, adds up to +5 dB at 16 kHz. */
+    /** 0..1 ("Treble enhancement", same shape as RDM Player): up to +8 dB at 16 kHz. */
     val trebleBoost: Float = 0f,
+    /** Volume-dependent loudness compensation (RDM Eq feature). */
     val loudness: Boolean = false,
+    /** 0..10 dB make-up gain held under the limiter ("Loudness" in RDM Player). */
+    val loudnessGainDb: Float = 0f,
+    /** Gentle compressor that evens out loud and quiet passages ("Volume normalization"). */
+    val normalization: Boolean = false,
     /** -1 (left) .. +1 (right). */
     val balance: Float = 0f,
     val limiter: Boolean = true,
@@ -35,6 +40,7 @@ data class AudioSettings(
 ) {
     companion object {
         const val PREAMP_MIN = -12f
-        const val PREAMP_MAX = 6f
+        const val PREAMP_MAX = 12f
+        const val LOUDNESS_GAIN_MAX = 10f
     }
 }

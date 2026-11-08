@@ -44,6 +44,7 @@ class EqController(
     val status = engine.status
 
     init {
+        migratePresetValues()
         // Startup preset (if chosen) replaces the last-used curve when the process starts.
         val s = _settings.value
         if (s.startupPresetId.isNotEmpty()) {
@@ -58,6 +59,19 @@ class EqController(
         engine.setSessionMode(_settings.value.sessionMode)
         engine.setGlobalMode(_settings.value.globalMode)
         pushToEngine()
+    }
+
+    /**
+     * 1.3.0 gave some built-in presets RDM Player's values. A curve that is still exactly the old
+     * untouched preset follows it to the new values; anything the user edited is left alone.
+     */
+    private fun migratePresetValues() {
+        val s = _settings.value
+        val now = presetRepo.find(s.activePresetId) ?: return
+        val g = BuiltInPresets.migratedGains(s.activePresetId, s.gains, now.modified) ?: return
+        _settings.value = s.copy(gains = g)
+        settingsRepo.save(_settings.value)
+        DiagLog.i("Preset ${now.name} updated to the RDM Player values")
     }
 
     // ---- derived values -------------------------------------------------------------------
@@ -101,6 +115,8 @@ class EqController(
     fun setBassBoost(v: Float) = update { it.copy(bassBoost = v.coerceIn(0f, 1f)) }
     fun setTrebleBoost(v: Float) = update { it.copy(trebleBoost = v.coerceIn(0f, 1f)) }
     fun setLoudness(on: Boolean) = update { it.copy(loudness = on) }
+    fun setLoudnessGain(db: Float) = update { it.copy(loudnessGainDb = (Math.round(db * 2) / 2f).coerceIn(0f, AudioSettings.LOUDNESS_GAIN_MAX)) }
+    fun setNormalization(on: Boolean) = update { it.copy(normalization = on) }
     fun setBalance(v: Float) = update { it.copy(balance = v.coerceIn(-1f, 1f)) }
     fun setLimiter(on: Boolean) = update { it.copy(limiter = on) }
 
@@ -175,7 +191,12 @@ class EqController(
     fun pushToEngine() {
         val s = _settings.value
         val eff = effectiveGains(s)
-        engine.update(EngineParams(s.enabled, eff, CurveMath.resolvedPreamp(s, eff), s.balance, s.limiter))
+        engine.update(
+            EngineParams(
+                s.enabled, eff, CurveMath.resolvedPreamp(s, eff), s.balance, s.limiter,
+                loudnessGainDb = CurveMath.loudnessGain(s), normalization = s.normalization,
+            ),
+        )
     }
 
     private fun readVolume() {
